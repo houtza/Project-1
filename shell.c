@@ -63,7 +63,13 @@ int main(int argc, char *argv[])
 
 	}
       }
-      
+       
+
+      if(execvp(myArgv[0],myArgv)<0){
+        printf("failed");
+      }
+
+
       // if(execvp(*myArgv,myArgv)<0);{  Still trying to get execvp to work correctly
 	//return 0;   
       // }
