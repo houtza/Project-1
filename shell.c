@@ -64,9 +64,9 @@ int main(int argc, char *argv[])
 	}
       }
       
-      // if(execvp(*myArgv,myArgv)<0);{  Still trying to get execvp to work correctly
-	//return 0;   
-      // }
+       if(execvp(*myArgv,myArgv)<0);{  Still trying to get execvp to work correctly
+	  return 0;   
+       }
     }
   }else{
     waitpid(-1,NULL,0);//Parrent process waits for the child process to end
