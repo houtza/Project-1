@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
 	}
       }
       
-       if(execvp(*myArgv,myArgv)<0);{  Still trying to get execvp to work correctly
+       if(execvp(*myArgv,myArgv)<0);{  //Still trying to get execvp to work correctly
 	  return 0;   
        }
     }
