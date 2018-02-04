@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
 	if ((pid = fork()) == 0) { //Creats a parent and child fork of the code
 		int i;
 		while(1){              //Loops continuously untill "quit" is entered
-			char commands[80];//Can handle a imput up to 80 caricters
+			char commands[80]; //Can handle a imput up to 80 caricters
 			int tokenCounter=0;   //The counter for the # of tokens
 
 			for(i=0;i<10;i++){   //clears the array each iteration of the while loop
