@@ -21,14 +21,15 @@ void printWorkingDir();//Prints the current working directory path
 void printInColor(char *stringToColor); //Takes in the address of a string and prints it in red
 void execute(char **tokenArray);
 void clearArgs(char **argArray);
-void remove_new_line(char *s);
+void removeNewLine(char *s);
+void parseInput(char* commands, char **myArgv);
+void executeBuiltins(char** args);
 
 
 int main(int argc, char *argv[])
 {
  
   char *myArgv[ARGV_SIZE]; 
-  char *token;
   pid_t pid;
  
   while(1){//Loops continuously untill "quit" is entered
@@ -36,38 +37,14 @@ int main(int argc, char *argv[])
     
        
         char commands[80]; //Can handle a imput up to 80 caricters
-        int tokenCounter=0;   //The counter for the # of tokens
+      
 	clearArgs(myArgv);
         printWorkingDir(); 
         fgets(commands,80, stdin);  
-	    
-	//myArgv[0]="ls";  //It works when I populate the array in code
-	//myArgv[1]="-l";
-	//myArgv[2]=NULL;
-        token = strtok(commands," ");
-        remove_new_line(token);
-	//token = strtok(token,"\n");
-        printf(token);  
-        myArgv[tokenCounter]=token;
-	//printf("%s",myArgv[tokenCounter]); // Tester for printing out the tokens saved in the string pointer array
-
-        if((strcmp(token,"ls"))){
-          printf("worng\n");
-        }
-        while(token!=NULL){    //Loop throught the remaining tokens
-     
-	  token =strtok(NULL," ");
-	 
-	  if(token!=NULL){
-	    tokenCounter++;
-	    remove_new_line(token);      
-	    myArgv[tokenCounter]=token;
-	    printf("%s",myArgv[tokenCounter]); // Tester for printing out the tokens saved in the string pointer array    
-
-	  }
-        }
-        //myArgv[2]=NULL;
-        //execvp(arg[0],arg);
+        parseInput(commands,myArgv);//parses the tokens from the imput and inserts them into the myArgv array	    
+	// if(myArgv[0]=="exit"){
+	//executeBuiltins(myArgv);
+	// }
         execute(myArgv);      
   
     }else{
@@ -97,7 +74,7 @@ void execute(char **tokenArray){
   execvp(tokenArray[0],tokenArray);
 }
 
-//clears the array each iteration of the while loop
+//clears the array each iteration of the main while loop
 void clearArgs(char **argArray){
   int i;
   for(i=0;i<10;i++){   
@@ -106,7 +83,8 @@ void clearArgs(char **argArray){
 }
 
 
-void remove_new_line(char *s) {
+//removes the newline char from each token passed in
+void removeNewLine(char *s) {
   char *t = s;
   while (*s) {
     if (*s == '\n') {
@@ -117,6 +95,55 @@ void remove_new_line(char *s) {
 }
 
 
-void executeBuiltins(char** input){
-	
+void executeBuiltins(char** args){
+  int builtinChoice;
+  //char* builtin={"exit","cd","showpid"};
+  
+  char* builtin[3];
+  builtin[0]="exit";
+  builtin[1]="cd";
+  builtin[2]="showpid";
+ 
+  for(builtinChoice=1;builtinChoice<4;builtinChoice++){
+    if(args[0]==builtin[builtinChoice]){
+      break;
+    }
+  }
+
+  switch (builtinChoice){
+  case 1:
+    printf("exit");
+    exit(0);
+  case 2:
+    //cd();
+
+  case 3:
+    //showpid();
+
+  default:
+    break;
+  }
+}
+
+
+//Takes in a pointer to a  string from the prompt, parses it into tokens and saves them to an array of char pointers
+void parseInput(char* commands, char **myArgv){
+  char *token;
+  int tokenCounter=0;   //The counter for the # of tokens
+
+  token = strtok(commands," ");
+  removeNewLine(token);
+
+  printf(token);
+  myArgv[tokenCounter]=token;
+  while(token!=NULL){    //Loop throught the remaining tokens
+
+    token =strtok(NULL," ");
+
+    if(token!=NULL){
+      tokenCounter++;
+      removeNewLine(token);
+      myArgv[tokenCounter]=token;
+    }
+  }
 }
