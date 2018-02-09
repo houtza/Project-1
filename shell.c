@@ -23,42 +23,50 @@ void execute(char **tokenArray);
 void clearArgs(char **argArray);
 void removeNewLine(char *s);
 void parseInput(char* commands, char **myArgv);
-void executeBuiltins(char** args);
+int executeBuiltins(char**arg,int*pidArray);
+void printPid(int*pidArray);
 
 
 int main(int argc, char *argv[])
 {
- 
-  char *myArgv[ARGV_SIZE]; 
+
+  char *myArgv[ARGV_SIZE];
   pid_t pid;
- 
+  int pidSelect=0;
+  int pidValues[5]={0,0,0,0,0,};
+  int exeFlag;
+
+
   while(1){//Loops continuously untill "quit" is entered
-    if ((pid = fork()) == 0) { //Creats a parent and child fork of the code
-    
-       
-        char commands[80]; //Can handle a imput up to 80 caricters
-      
-	clearArgs(myArgv);
-        printWorkingDir(); 
-        fgets(commands,80, stdin);  
-        parseInput(commands,myArgv);//parses the tokens from the imput and inserts them into the myArgv array	    
-	// if(myArgv[0]=="exit"){
-	//executeBuiltins(myArgv);
-	// }
-        execute(myArgv);      
-  
-    }else{
-      waitpid(-1,NULL,0);//Parrent process waits for the child process to end
+
+    char commands[80]; //Can handle a imput up to 80 caricters
+
+    clearArgs(myArgv);
+    printWorkingDir();
+    fgets(commands,80, stdin);
+    parseInput(commands,myArgv);//parses the tokens from the imput and inserts them into the myArgv array
+    exeFlag=executeBuiltins(myArgv,pidValues);
+    if(exeFlag==0){
+     if ((pid = fork()) == 0) { //Creats a parent and child fork of the code
+
+          execute(myArgv);
+
+      }else{
+
+       pidValues[pidSelect] =waitpid(-1,NULL,0);//Parrent process waits for the child process to end
+       pidSelect++;
+       pidSelect=pidSelect%5;
+      }
     }
   }
- 
+
   return 0;
 }
 
 
 //Takes in the address of a string and prints it in red
 void printInColor(char *stringToColor){
-  
+
   printf(RED  "%s$ "RESET, stringToColor);
 }
 
@@ -71,13 +79,15 @@ void printWorkingDir(){
 }
 
 void execute(char **tokenArray){
-  execvp(tokenArray[0],tokenArray);
+  if( execvp(tokenArray[0],tokenArray)<0){
+    printf("invalid input\n");
+  }
 }
 
 //clears the array each iteration of the main while loop
 void clearArgs(char **argArray){
   int i;
-  for(i=0;i<10;i++){   
+  for(i=0;i<10;i++){
     argArray[i]=NULL;
   }
 }
@@ -85,7 +95,7 @@ void clearArgs(char **argArray){
 
 //removes the newline char from each token passed in
 void removeNewLine(char *s) {
-  char *t = s;
+   char *t = s;
   while (*s) {
     if (*s == '\n') {
       *s='\0';
@@ -95,32 +105,43 @@ void removeNewLine(char *s) {
 }
 
 
-void executeBuiltins(char** args){
+int executeBuiltins(char** args,int* pidArray){
   int builtinChoice;
   //char* builtin={"exit","cd","showpid"};
-  
+  //printf("test1");
   char* builtin[3];
   builtin[0]="exit";
   builtin[1]="cd";
   builtin[2]="showpid";
- 
-  for(builtinChoice=1;builtinChoice<4;builtinChoice++){
-    if(args[0]==builtin[builtinChoice]){
+
+  for(builtinChoice=0;builtinChoice<3;builtinChoice++){
+    if((strcmp(builtin[builtinChoice],args[0]))==0){
       break;
     }
   }
 
-  switch (builtinChoice){
-  case 1:
-    printf("exit");
-    exit(0);
-  case 2:
-    //cd();
+  // printf("%d", builtinChoice);
+   switch (builtinChoice){
+  case 0:
 
-  case 3:
-    //showpid();
+    exit(0);
+    return 1;
+    break;
+
+  case 1:
+    //cd();
+    printf("test3");
+    //  chdir(..);
+    return 1;
+    break;
+  case 2:
+
+    printPid(pidArray);
+    return 1;
+    break;
 
   default:
+    return 0;
     break;
   }
 }
@@ -134,7 +155,6 @@ void parseInput(char* commands, char **myArgv){
   token = strtok(commands," ");
   removeNewLine(token);
 
-  printf(token);
   myArgv[tokenCounter]=token;
   while(token!=NULL){    //Loop throught the remaining tokens
 
@@ -147,3 +167,12 @@ void parseInput(char* commands, char **myArgv){
     }
   }
 }
+
+
+void printPid(int* pidArray){
+  int i;
+  for(i=4;i>-1;i--){
+    printf("%d\n",pidArray[i]);
+  }
+}
+
